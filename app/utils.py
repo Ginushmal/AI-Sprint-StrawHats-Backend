@@ -114,4 +114,4 @@ def rank_products(products):
     data["rank"] = rankdata(-data["score"], method="min")  # Negative for descending order
 
     # Return the DataFrame sorted by rank
-    return data.sort_values("rank")
+    return data.sort_values("rank").to_dict(orient="records")
