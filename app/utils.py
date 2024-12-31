@@ -21,7 +21,7 @@ def add_to_chat_history(session: dict ,message: str):
         session["chat_history"] = []  # Initialize if not present
     session["chat_history"].append(message)
     # only keep the last 5 messages in the chat history
-    session["chat_history"] = session["chat_history"][-5:]
+    # session["chat_history"] = session["chat_history"][-5:]
     
     return session["chat_history"] 
 

@@ -1,7 +1,8 @@
-from fastapi import FastAPI,Body
+from fastapi import FastAPI,Body ,Request
 from starlette.middleware.sessions import SessionMiddleware
 from app.dependencies import get_session_secret_key, perform_search, perform_search_advanced
 from app.routes import router
+from .chatAgentFuncs import talk_to_gpt
 
 app = FastAPI()
 
@@ -24,3 +25,8 @@ def search(query: str):
 @app.post("/search-advanced")
 def process_json(data: dict = Body(...)):
     return perform_search_advanced(data)
+
+@app.post("/talk_to_bot")
+def talk_to_bot(message: str , request: Request):
+    top_5_search_results = talk_to_gpt(user_input=message,request=request)
+    return {"top_5_search_results": top_5_search_results}

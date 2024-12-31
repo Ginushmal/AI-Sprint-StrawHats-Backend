@@ -42,6 +42,11 @@ def perform_search_advanced(data: dict):
     """Perform a search using the external search API."""
     url = "https://www.searchapi.io/api/v1/search"
     api_key = get_search_api_key()
+    
+    if price_max == price_min:
+        price_max = None
+        price_min = None
+    
     params = {
         "engine": "google_shopping",
         "q": query,
@@ -54,4 +59,5 @@ def perform_search_advanced(data: dict):
     }
     response = requests.get(url, params=params)
     response.raise_for_status()  # Raise an HTTPError for bad responses
+    # print("resssssssssss",response.json())
     return response.json()["shopping_results"]
