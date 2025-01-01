@@ -91,7 +91,7 @@ def rank_products(products):
     weights = calculate_weights(pairwise_matrix)
 
     # Map weights to parameters
-    parameters = ["price", "rating", "reviews"]
+    parameters = ["extended_price", "rating", "reviews"]
     weights_dict = dict(zip(parameters, weights))
 
     # Step 3: Normalize the data for products
@@ -99,13 +99,13 @@ def rank_products(products):
     data = pd.DataFrame(products)
 
     # Normalize each parameter (lower price is better, higher rating/reviews are better)
-    data["price_normalized"] = 1 / data["price"]  # Inverse since lower price is better
+    data["price_normalized"] = 1 / data["extended_price"]  # Inverse since lower price is better
     data["rating_normalized"] = data["rating"] / data["rating"].max()
     data["reviews_normalized"] = data["reviews"] / data["reviews"].max()
 
     # Step 4: Compute final scores for each product
     data["score"] = (
-        weights_dict["price"] * data["price_normalized"] +
+        weights_dict["extended_price"] * data["price_normalized"] +
         weights_dict["rating"] * data["rating_normalized"] +
         weights_dict["reviews"] * data["reviews_normalized"]
     )
