@@ -1,2 +1,10 @@
 openai
 itsdangerous
+
+# AI-Sprint-StrawHats-Backend/app/inventory_detection.py
+torch
+torchvision
+pillow
+matplotlib
+opencv-python
+ultralytics
