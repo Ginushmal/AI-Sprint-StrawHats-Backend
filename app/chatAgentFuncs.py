@@ -77,7 +77,7 @@ def order_the_best_5_search_results(session: dict ,best_five_results: str ,user_
     
     # print("User searched quarry: ", users_quarry)
     
-    quarry = users_quarry + " These are the attributes of the item user searched for , according to that , rank the following 5 search results to mach the users search criteria and to be the overall best product from the search results considering all the factors like users needs, price, rating, reviews, and other features. keep your reasoning very short , and remember you are giving this reasoning directly to the user so use proper pronounce. 5 Search results : "+ result_json_string
+    quarry = users_quarry + " These are the attributes of the item user searched for , according to that , rank the following top 5 search results to mach the users search criteria and to be the overall best product from the search results considering all the factors like users needs, price, rating, reviews, and other features.'score' attribute in these are given according to our analytical hierarchy process from all the search results , use that also but no need to tell about that to the user. keep your reasoning very short , and remember you are giving this reasoning directly to the user so use proper pronounce. 5 Search results : "+ result_json_string
     
     class OrderStructured(BaseModel):
         reasons_for_the_order: str
@@ -389,6 +389,7 @@ def talk_to_gpt(user_input : str ,request: Request):
             # print("Passing arguments to search_item function: ",arguments )
             # argument is a string in json format, so we need to parse it
             function_response_msg = search_item(session=session,attributes_json=arguments, user_input=user_input)
+            function_response_msg = json.loads(function_response_msg)
             
     return_msg = ""
     
