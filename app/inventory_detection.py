@@ -8,17 +8,17 @@ import ipywidgets as widgets
 from IPython.display import display, clear_output
 
 # ============================
-# Step 1: Load the YOLOv8 Model
+# Step 1: Load the YOLO11x Model
 # ============================
 
 model_variant = 'yolo11x.pt'  # Change to other variants if needed
 
-# Load the YOLOv8 model
+# Load the YOLO11x model
 try:
     model = YOLO(model_variant)
-    print(f"YOLOv8 '{model_variant}' model loaded successfully.")
+    print(f"YOLO11x '{model_variant}' model loaded successfully.")
 except Exception as e:
-    print(f"Error loading YOLOv8 model: {e}")
+    print(f"Error loading YOLO11x model: {e}")
 
 # ============================
 # Step 2: Define the Inventory Detection Function
@@ -26,7 +26,7 @@ except Exception as e:
 
 def detect_inventory(image_path, confidence_threshold=0.3, iou_threshold=0.5):
     """
-    Detects inventory items in the given image using YOLOv8 and returns a DataFrame.
+    Detects inventory items in the given image using YOLO11x and returns a DataFrame.
 
     Args:
         image_path (str): Path to the input image.
@@ -35,7 +35,7 @@ def detect_inventory(image_path, confidence_threshold=0.3, iou_threshold=0.5):
 
     Returns:
         inventory_df (DataFrame): Detected inventory with item name and count.
-        results (list): YOLOv8 inference results.
+        results (list): YOLO11x inference results.
     """
     print(f"\nProcessing image for inventory detection: {image_path}")
 
@@ -91,7 +91,7 @@ def display_results(image_path, results):
 
     Args:
         image_path (str): Path to the input image.
-        results (list): YOLOv8 inference results.
+        results (list): YOLO11x inference results.
     """
     print(f"\nDisplaying results for image: {image_path}")
 
