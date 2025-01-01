@@ -37,7 +37,7 @@ def process_json(data: dict = Body(...)):
 @app.post("/talk_to_bot")
 def talk_to_bot(message: str, request: Request):
     top_5_search_results = talk_to_gpt(user_input=message, request=request)
-    return {"top_5_search_results": top_5_search_results}
+    return top_5_search_results
 
 @app.post("/clear-session")
 async def clear_session(request: Request):

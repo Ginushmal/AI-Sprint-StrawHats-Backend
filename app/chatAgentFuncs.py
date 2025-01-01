@@ -52,7 +52,7 @@ def order_the_best_5_search_results(session: dict ,best_five_results: str ,user_
     
     # Extract product details from the results
     product_attributes = []
-    for product in best_five_results_copy.get("results", []):
+    for product in best_five_results_copy.get("search_results", []):
         product.pop("product_link", None)
         product.pop("offers_link", None)
         product.pop("thumbnail", None)
@@ -61,7 +61,7 @@ def order_the_best_5_search_results(session: dict ,best_five_results: str ,user_
             product
         )
         
-    print("Bet 5 result s",best_five_results.get("results", []))
+    print("Bet 5 result s",best_five_results.get("search_results", []))
     # Combine the search index and product attributes into a final JSON object
     result_json = {
         # "search_index": search_index,
@@ -117,7 +117,7 @@ def order_the_best_5_search_results(session: dict ,best_five_results: str ,user_
     
     best_five_results["chat_reply"] = reasoning
     
-    for results in best_five_results["results"]:
+    for results in best_five_results["search_results"]:
         # Use 'product_id' if available; fallback to 'prds' otherwise
         product_identifier = results.get("product_id") or results.get("prds")
         results["rank"] = product_rank_map.get(product_identifier, "Not Ranked")
@@ -220,22 +220,22 @@ somple_top_search_results= {
 
 
 
-def search (attri : str):
-    # print("searching for : ",attri)
-    # global somple_top_search_results
-    # # convert somple_top_search_results to json string
+# def search (attri : str):
+#     # print("searching for : ",attri)
+#     # global somple_top_search_results
+#     # # convert somple_top_search_results to json string
     
-    # convert the json string attri to json dict object
-    attri_json = json.loads(attri)
+#     # convert the json string attri to json dict object
+#     attri_json = json.loads(attri)
     
-    all_searcch_result = perform_search_advanced(attri_json)
+#     all_searcch_result = perform_search_advanced(attri_json)
     
-    first_5_search_results = rank_products(all_searcch_result)[:5]
+#     first_5_search_results = rank_products(all_searcch_result)[:5]
     
-    somple_top_search_results = {"results": first_5_search_results}
+#     somple_top_search_results = {"search_results": first_5_search_results}
     
-    string_reult = json.dumps(somple_top_search_results)
-    return string_reult
+#     string_reult = json.dumps(somple_top_search_results)
+#     return string_reult
 
 
 
@@ -396,7 +396,7 @@ def talk_to_gpt(user_input : str ,request: Request):
 
     if response_msg and function_response_msg:
         function_response_msg = json.loads(function_response_msg)
-        full_reply = response_msg + function_response_msg
+        full_reply = response_msg + function_response_msg['chat_reply']
         function_response_msg['chat_reply'] = full_reply
         # convert back to string 
         return_msg = json.dumps(function_response_msg)
@@ -421,10 +421,15 @@ def search_item(session: dict ,attributes_json: str , user_input : str):
     # global search_id
     # search_id += 1
     arguments = json.loads(attributes_json)
-    # print("attributes has been received", attributes_json)
-    # add_to_search_history(arguments)
-    top_results = search (attributes_json)
+    
+    all_searcch_result = perform_search_advanced(arguments)
+    
+    first_5_search_results = rank_products(all_searcch_result)[:5]
+    
+    somple_top_search_results = {"search_results": first_5_search_results}
+    
+    string_reult = json.dumps(somple_top_search_results)
 
-    result_with_reasons = order_the_best_5_search_results(session=session,best_five_results=top_results,user_input=user_input)
+    result_with_reasons = order_the_best_5_search_results(session=session,best_five_results=string_reult,user_input=user_input)
     
     return result_with_reasons
