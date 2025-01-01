@@ -35,3 +35,8 @@ def talk_to_bot(message: str , request: Request):
 async def clear_session(request: Request):
     request.session.clear()  # Clears all session data
     return {"message": "Session data cleared successfully."}
+
+@app.post("/echo")
+# return the 'message' parameter in the request body
+def echo(message: str):
+    return {"message": message}
