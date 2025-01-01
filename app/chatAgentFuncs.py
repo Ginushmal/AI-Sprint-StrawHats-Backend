@@ -40,15 +40,19 @@ def openAI_chat_assistant(session: dict ,new_message: str,tools= None,response_f
 
 def order_the_best_5_search_results(session: dict ,best_five_results: str ,user_input: str):
     # Parse the input JSON string
+    best_five_results_copy = json.loads(best_five_results)
     best_five_results = json.loads(best_five_results)
-    print("Bet 5 result s",best_five_results.get("results", []))
+    
     
     # Extract the search index from the parsed JSON
     # search_index = best_five_results.get("search_index", "Unknown Search Index")
     
+    # get a copy of best_five_results
+    # best_five_results_copy = best_five_results.copy()
+    
     # Extract product details from the results
     product_attributes = []
-    for product in best_five_results.get("results", []):
+    for product in best_five_results_copy.get("results", []):
         product.pop("product_link", None)
         product.pop("offers_link", None)
         product.pop("thumbnail", None)
@@ -56,7 +60,8 @@ def order_the_best_5_search_results(session: dict ,best_five_results: str ,user_
             # remove product_link , offers_link , thumbnail from the product attributes , other attributes could differ
             product
         )
-    
+        
+    print("Bet 5 result s",best_five_results.get("results", []))
     # Combine the search index and product attributes into a final JSON object
     result_json = {
         # "search_index": search_index,
