@@ -5,6 +5,7 @@ client = OpenAI()
 from .utils import get_chat_history, add_to_chat_history, rank_products
 from fastapi import Request
 from .dependencies import perform_search_advanced
+import numpy as np
 
 # Define the function with chat history memory
 def openAI_chat_assistant(session: dict ,new_message: str,tools= None,response_format=None ,  temperature: float = 0, max_tokens: int = 1024 ) :
@@ -237,7 +238,16 @@ somple_top_search_results= {
 #     string_reult = json.dumps(somple_top_search_results)
 #     return string_reult
 
-
+# Replace NaN with null or another value (e.g., 0)
+def replace_nan(obj):
+    if isinstance(obj, dict):
+        return {k: replace_nan(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [replace_nan(item) for item in obj]
+    elif isinstance(obj, float) and np.isnan(obj):
+        return None  # Replace NaN with null for JSON
+    else:
+        return obj
 
 def talk_to_gpt(user_input : str ,request: Request):
     
@@ -390,6 +400,7 @@ def talk_to_gpt(user_input : str ,request: Request):
             # argument is a string in json format, so we need to parse it
             function_response_msg = search_item(session=session,attributes_json=arguments, user_input=user_input)
             function_response_msg = json.loads(function_response_msg)
+            function_response_msg = replace_nan(function_response_msg)
             
     return_msg = ""
     
@@ -407,6 +418,8 @@ def talk_to_gpt(user_input : str ,request: Request):
     elif response_msg:
         # create a json object with the chat reply key
         return_msg = {"chat_reply": response_msg}
+    
+    
     
     return_msg = json.dumps(return_msg)   
     chat_history= add_to_chat_history(session=session,message={"role": "assistant", "content": return_msg})
