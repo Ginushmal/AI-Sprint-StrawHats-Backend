@@ -2,7 +2,7 @@ import json
 from pydantic import BaseModel
 from openai import OpenAI
 client = OpenAI()
-from .utils import get_chat_history, add_to_chat_history
+from .utils import get_chat_history, add_to_chat_history, rank_products
 from fastapi import Request
 from .dependencies import perform_search_advanced
 
@@ -230,7 +230,7 @@ def search (attri : str):
     
     all_searcch_result = perform_search_advanced(attri_json)
     
-    first_5_search_results = all_searcch_result[:5]
+    first_5_search_results = rank_products(all_searcch_result)[:5]
     
     somple_top_search_results = {"results": first_5_search_results}
     
