@@ -98,6 +98,10 @@ def rank_products(products):
     # Convert product data to a DataFrame
     data = pd.DataFrame(products)
 
+    # Fill missing values with 0
+    data["rating"] = data["rating"].fillna(0)
+    data["reviews"] = data["reviews"].fillna(0)
+
     # Normalize each parameter (lower price is better, higher rating/reviews are better)
     data["price_normalized"] = 1 / data["extracted_price"]  # Inverse since lower price is better
     data["rating_normalized"] = data["rating"] / data["rating"].max()
