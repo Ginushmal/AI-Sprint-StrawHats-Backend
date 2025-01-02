@@ -1,7 +1,10 @@
+import json
 from typing import List
 import numpy as np
 import pandas as pd
 from scipy.stats import rankdata
+import zlib
+import base64
 
 def update_session_list(session: dict, item: str):
     """Update the list stored in the session."""
@@ -16,21 +19,42 @@ def get_session_list(session: dict) -> List[str]:
 
 
 
-def add_to_chat_history(session: dict ,message: str):
+def add_to_chat_history(session: dict, message: dict):
+    # Check if "chat_history" exists in the session
     if "chat_history" not in session:
-        session["chat_history"] = []  # Initialize if not present
-    session["chat_history"].append(message)
-    # only keep the last 5 messages in the chat history
-    # session["chat_history"] = session["chat_history"][-5:]
+        # Initialize as an empty encoded list
+        encoded_chat_history = base64.b64encode(zlib.compress(json.dumps([]).encode())).decode()
+        session["chat_history"] = encoded_chat_history
     
-    return session["chat_history"] 
+    # Decompress and decode the existing chat history
+    chat_his_decoded = json.loads(
+        zlib.decompress(base64.b64decode(session["chat_history"].encode())).decode()
+    )
+    
+    # Append the new message
+    chat_his_decoded.append(message)
+    
+    chat_his_decoded = chat_his_decoded[-5:]  # Keep only the last 5 messages
+    
+    # Compress and encode the updated chat history
+    chat_his_encoded = base64.b64encode(zlib.compress(json.dumps(chat_his_decoded).encode())).decode()
+    session["chat_history"] = chat_his_encoded
+    
+    return chat_his_decoded
 
 def get_chat_history(session: dict):
+    # Check if "chat_history" exists in the session
     if "chat_history" not in session:
-        session["chat_history"] = []  # Initialize if not present
+        # Initialize as an empty encoded list
+        encoded_chat_history = base64.b64encode(zlib.compress(json.dumps([]).encode())).decode()
+        session["chat_history"] = encoded_chat_history
     
-    return session["chat_history"]
-
+    # Decode and decompress the chat history
+    chat_his_decoded = json.loads(
+        zlib.decompress(base64.b64decode(session["chat_history"].encode())).decode()
+    )
+    
+    return chat_his_decoded
 
 def add_to_search_history(session: dict ,search_index: int, search_item: str):
     if "search_history" not in session:

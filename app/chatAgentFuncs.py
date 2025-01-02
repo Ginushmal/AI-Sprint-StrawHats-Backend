@@ -1,4 +1,6 @@
+import copy
 import json
+import math
 from pydantic import BaseModel
 from openai import OpenAI
 client = OpenAI()
@@ -42,6 +44,7 @@ def openAI_chat_assistant(session: dict ,new_message: str,tools= None,response_f
 def order_the_best_5_search_results(session: dict ,best_five_results: str ,user_input: str):
     # Parse the input JSON string
     best_five_results_copy = json.loads(best_five_results)
+    best_five_results_copy_2 = json.loads(best_five_results)
     best_five_results = json.loads(best_five_results)
     
     
@@ -53,16 +56,47 @@ def order_the_best_5_search_results(session: dict ,best_five_results: str ,user_
     
     # Extract product details from the results
     product_attributes = []
+    
+    product_list_for_chat_history = []
+    
     for product in best_five_results_copy.get("search_results", []):
         product.pop("product_link", None)
         product.pop("offers_link", None)
         product.pop("thumbnail", None)
+        product.pop("price_normalized",None)
+        product.pop("rating_normalized",None)
+        product.pop("reviews_normalized",None)
+        product.pop("rank",None)
+        product.pop("position",None)
+        product.pop("extracted_price",None)
+        product.pop("extracted_original_price",None)
         product_attributes.append(
             # remove product_link , offers_link , thumbnail from the product attributes , other attributes could differ
             product
         )
+    
+    for product in best_five_results_copy_2.get("search_results", []):
+        product.pop("offers_link", None)
+        product.pop("price_normalized",None)
+        product.pop("rating_normalized",None)
+        product.pop("reviews_normalized",None)
+        product.pop("position",None)
+        product.pop("extracted_price",None)
+        product.pop("extracted_original_price",None)
         
-    print("Bet 5 result s",best_five_results.get("search_results", []))
+        # get the product id from product
+        product_id = product.get('product_id')
+        # if product id is NaN\
+        if product_id is None or (isinstance(product_id, float) and math.isnan(product_id)):
+            product['product_id'] = product.get('prds')
+        
+        print("Produccccccccccct : ", product)        
+        
+        product_list_for_chat_history.append(
+            product
+        )
+        
+    # print("Bet 5 result s",best_five_results.get("search_results", []))
     # Combine the search index and product attributes into a final JSON object
     result_json = {
         # "search_index": search_index,
@@ -78,15 +112,15 @@ def order_the_best_5_search_results(session: dict ,best_five_results: str ,user_
     
     # print("User searched quarry: ", users_quarry)
     
-    quarry = users_quarry + " These are the attributes of the item user searched for , according to that , rank the following top 5 search results to mach the users search criteria and to be the overall best product from the search results considering all the factors like users needs, price, rating, reviews, and other features.'score' attribute in these are given according to our analytical hierarchy process from all the search results , use that also but no need to tell about that to the user. keep your reasoning very short , and remember you are giving this reasoning directly to the user so use proper pronounce. 5 Search results : "+ result_json_string
+    quarry = users_quarry + " These are the attributes of the item user searched for , according to that , rank the following top 5 search results to mach the users search criteria and to be the overall best product from the search results considering all the factors .'score' attribute in these are given according to our analytical hierarchy process from all the search results . keep your reasoning very short , and remember you are giving this reasoning directly to the user so use proper pronounce. 5 Search results : "+ result_json_string
     
     class OrderStructured(BaseModel):
         reasons_for_the_order: str
-        search_result_rank_1_product_id: str
-        search_result_rank_2_product_id: str
-        search_result_rank_3_product_id: str
-        search_result_rank_4_product_id: str
-        search_result_rank_5_product_id: str
+        product_ID_of_the_rank_1_search_result_according_to_you_should_not_be_NaN: str
+        product_ID_of_the_rank_2_search_result_according_to_you_should_not_be_NaN: str
+        product_ID_of_the_rank_3_search_result_according_to_you_should_not_be_NaN: str
+        product_ID_of_the_rank_4_search_result_according_to_you_should_not_be_NaN: str
+        product_ID_of_the_rank_5_search_result_according_to_you_should_not_be_NaN: str
         
     completion = client.beta.chat.completions.parse(
     model="gpt-4o-mini",
@@ -99,37 +133,54 @@ def order_the_best_5_search_results(session: dict ,best_five_results: str ,user_
     
     json_gpt_ranking = completion.choices[0].message.content
     
-    # print(json_gpt_ranking)
+    print("GPT rankings",json_gpt_ranking)
     
         # Parse the GPT response for the ranking information
     ranking_info = json.loads(json_gpt_ranking)
     
     # Map product IDs to their ranks
     product_rank_map = {
-        ranking_info["search_result_rank_1_product_id"]: 1,
-        ranking_info["search_result_rank_2_product_id"]: 2,
-        ranking_info["search_result_rank_3_product_id"]: 3,
-        ranking_info["search_result_rank_4_product_id"]: 4,
-        ranking_info["search_result_rank_5_product_id"]: 5,
+        ranking_info["product_ID_of_the_rank_1_search_result_according_to_you_should_not_be_NaN"]: 1,
+        ranking_info["product_ID_of_the_rank_2_search_result_according_to_you_should_not_be_NaN"]: 2,
+        ranking_info["product_ID_of_the_rank_3_search_result_according_to_you_should_not_be_NaN"]: 3,
+        ranking_info["product_ID_of_the_rank_4_search_result_according_to_you_should_not_be_NaN"]: 4,
+        ranking_info["product_ID_of_the_rank_5_search_result_according_to_you_should_not_be_NaN"]: 5,
     }
+    
+    print("Product rank map: ", product_rank_map)
     
     # Add rank and reasoning to each product in the result
     reasoning = ranking_info["reasons_for_the_order"]
     
-    best_five_results["chat_reply"] = reasoning
+    # best_five_results["chat_reply"] = reasoning
     
-    for results in best_five_results["search_results"]:
-        # Use 'product_id' if available; fallback to 'prds' otherwise
-        product_identifier = results.get("product_id") or results.get("prds")
-        results["rank"] = product_rank_map.get(product_identifier, "Not Ranked")
+    # for results in best_five_results["search_results"]:
+    #     # Use 'product_id' if available; fallback to 'prds' otherwise
+    #     product_identifier = results.get("product_id") or results.get("prds")
+    #     results["rank"] = product_rank_map.get(product_identifier, "Not Ranked")
 
 
-    # Convert the final result to a JSON string with ranks and reasoning
-    result_json_string_with_ranking = json.dumps(best_five_results, indent=4)
+    # # Convert the final result to a JSON string with ranks and reasoning
+    # result_json_string_with_ranking = json.dumps(best_five_results, indent=4)
     
     # print("final result with ranking and reasoning: ", result_json_string_with_ranking)
     
-    add_to_chat_history(session=session,message={"role": "assistant", "content": result_json_string_with_ranking})
+    # add_to_chat_history(session=session,message={"role": "assistant", "content": result_json_string_with_ranking})
+    
+    print ("Product list for chat history : ", product_list_for_chat_history)
+    
+    for results in product_list_for_chat_history:
+        # Use 'product_id' if available; fallback to 'prds' otherwise
+        product_identifier = results.get("product_id") 
+        results["GPT_rank"] = product_rank_map.get(product_identifier, "Not Ranked")
+    
+    
+    print("Product list for chat history after ranking : ", product_list_for_chat_history)
+    json_for_chat_history = {"search_results" : product_list_for_chat_history , "chat_reply" : reasoning}
+    
+    # convert the json object to a string
+    result_json_string_with_ranking = json.dumps(json_for_chat_history, indent=4)
+    
     
     return result_json_string_with_ranking
 
@@ -386,6 +437,8 @@ def talk_to_gpt(user_input : str ,request: Request):
     response = openAI_chat_assistant(session=session,new_message=user_input,tools=tools)
     response_msg = response.choices[0].message.content
     function_response_msg = None
+    
+    print("Response message........: ", response_msg)
 
     # if there is a function call, extract the function call information
     response_func = None
@@ -405,29 +458,47 @@ def talk_to_gpt(user_input : str ,request: Request):
     return_msg = ""
     
 
-
-    if response_msg and function_response_msg:
-        function_response_msg = json.loads(function_response_msg)
-        full_reply = response_msg + function_response_msg['chat_reply']
-        function_response_msg['chat_reply'] = full_reply
-        # convert back to string 
-        return_msg = json.dumps(function_response_msg)
         
-    elif function_response_msg:
+    if function_response_msg:
         return_msg = function_response_msg
+        search_results = function_response_msg.get("search_results")
+        
+        # get a copy of search results so the original search results are not modified
+        search_results_copy = copy.deepcopy(search_results)
+        
+        product_list_for_chat_history = []
+        
+        for product in search_results_copy:
+            product.pop("product_link", None)
+            product.pop("thumbnail",None)
+            product.pop("product_id",None)
+            product.pop("prds",None)
+
+            product_list_for_chat_history.append(
+                product
+            )
+        
+        
+        
+        # convert the search results to a string
+        search_results_str = json.dumps(product_list_for_chat_history, indent=4)
+        # search_results_str = "fake search results string"
+        print("type of the search_results_str : ", type(search_results_str))
+        # print("Type of a string to compare : ", type("fake search results string"))
+        add_to_chat_history(session=session,message={"role": "assistant", "content": f"Here is the top 5 items for your search : {search_results_str}" })
     elif response_msg:
         # create a json object with the chat reply key
         return_msg = {"chat_reply": response_msg}
     
     
-    
-    return_msg = json.dumps(return_msg)   
-    chat_history= add_to_chat_history(session=session,message={"role": "assistant", "content": return_msg})
+    print("Chat reply: ", return_msg["chat_reply"])
+      
+    chat_history= add_to_chat_history(session=session,message={"role": "assistant", "content": f"{return_msg["chat_reply"]}"})
 
     #   show_user(return_msg)
     # print("show user msg :" , return_msg)
-    print("Chat Historyyyyyy..: ",chat_history)
-    
+    print("Chat Historyyyyyy..: ",get_chat_history(session))
+    return_msg = json.dumps(return_msg)     
     return return_msg
 
 # search_id = 0
