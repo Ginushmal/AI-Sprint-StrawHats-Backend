@@ -80,3 +80,10 @@ def check_inventory(request: Request):
         message = f"I want to buy {most_wanted_item['Item']}."
         top_5_search_results = talk_to_gpt(user_input=message, request=request)
         return {"message": f"Running low on {most_wanted_item['Item']}.", "status": 1, "bot_output": top_5_search_results}
+
+@app.post("/check_fridge")
+def check_fridge(request: Request):
+    top_5_search_results = talk_to_gpt(user_input="I want banana", request=request)
+    # status if changed = 0
+    status = 1
+    return {"status":status,"message":"Running low on bananas", "bot_output":top_5_search_results}
