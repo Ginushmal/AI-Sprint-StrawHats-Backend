@@ -11,7 +11,7 @@ from IPython.display import display, clear_output
 # Step 1: Load the YOLO11x Model
 # ============================
 
-model_variant = 'yolo11x.pt'  # Change to other variants if needed
+model_variant = '../models/yolov11x.pt'  # Change to other variants if needed
 
 # Load the YOLO11x model
 try:
