@@ -3,4 +3,5 @@ AI_Sprint_OpenAI_API_Key.yml
 .env
 
 __pycache__/
-**/__pycache__/
+
+.venv/
