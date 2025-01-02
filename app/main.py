@@ -4,6 +4,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.dependencies import get_session_secret_key, perform_search, perform_search_advanced
 from app.routes import router
 from app.inventory_detection import detect_inventory
+from app.mock_camera import MockCamera
 from .chatAgentFuncs import talk_to_gpt
 
 app = FastAPI()
@@ -52,7 +53,8 @@ def echo(message: str):
 @app.post("/check-inventory")
 def check_inventory(request: Request):
     previous_inventory = [{'Item': 'apple', 'Count': 5}, {'Item': 'broccoli', 'Count': 1}, {'Item': 'cake', 'Count': 2}]
-    image_path = 'path/to/image.jpg'
+    mock_camera = MockCamera()
+    image_path = mock_camera.get_img_path()
     inventory_df, results = detect_inventory(image_path)
     current_inventory = inventory_df.to_dict('records')
 
