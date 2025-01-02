@@ -77,7 +77,7 @@ def check_inventory(request: Request):
                 if prev['Item'] == current['Item']:
                     if prev['Count'] > current['Count']:
                         changed_inventory.append({'Item': prev['Item'], 'Count': prev['Count'] - current['Count']})
-                        break
+                    break
             else:
                 changed_inventory.append({'Item': prev['Item'], 'Count': prev['Count']})
         most_wanted_item = max(changed_inventory, key=lambda x: x['Count'])
