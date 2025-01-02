@@ -77,6 +77,6 @@ def check_inventory(request: Request):
             else:
                 changed_inventory.append({'Item': current['Item'], 'Count': current['Count']})
         most_wanted_item = max(changed_inventory, key=lambda x: x['Count'])
-        message = f"I want to buy {most_wanted_item['Item']}"
+        message = f"I want to buy {most_wanted_item['Item']}."
         top_5_search_results = talk_to_gpt(user_input=message, request=request)
         return {"message": f"Running low on {most_wanted_item['Item']}.", "status": 1, "bot_output": top_5_search_results}
