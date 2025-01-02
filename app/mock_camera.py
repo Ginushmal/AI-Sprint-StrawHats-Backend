@@ -13,7 +13,7 @@ class SingletonMeta(type):
 
 
 class MockCamera(metaclass=SingletonMeta):
-    def __init__(self, folder_path="./test_images"):
+    def __init__(self, folder_path="../test_images"):
         self.folder_path = Path(folder_path)
         self.images = sorted(self.folder_path.glob("img_*.jpg")) + sorted(
             self.folder_path.glob("img_*.png")
