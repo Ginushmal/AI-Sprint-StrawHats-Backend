@@ -20,46 +20,41 @@ def get_session_list(session: dict) -> List[str]:
 
 
 def add_to_chat_history(session: dict, message: dict):
-    # Decode the existing chat history if it exists
-    chat_his_decoded = []
-    if "chat_history_chunks" in session:
-        # Reassemble chat history from chunks
-        chat_history_encoded = "".join(session["chat_history_chunks"])
-        chat_his_decoded = json.loads(
-            zlib.decompress(base64.b64decode(chat_history_encoded.encode())).decode()
-        )
-
+    # Check if "chat_history" exists in the session
+    if "chat_history" not in session:
+        # Initialize as an empty encoded list
+        encoded_chat_history = base64.b64encode(zlib.compress(json.dumps([]).encode())).decode()
+        session["chat_history"] = encoded_chat_history
+    
+    # Decompress and decode the existing chat history
+    chat_his_decoded = json.loads(
+        zlib.decompress(base64.b64decode(session["chat_history"].encode())).decode()
+    )
+    
     # Append the new message
     chat_his_decoded.append(message)
-
-    # Limit to the last 5 messages
-    chat_his_decoded = chat_his_decoded[-5:]
-
+    
+    chat_his_decoded = chat_his_decoded[-5:]  # Keep only the last 5 messages
+    
     # Compress and encode the updated chat history
-    encoded_chat_history = base64.b64encode(zlib.compress(json.dumps(chat_his_decoded).encode())).decode()
-
-    # Split the encoded string into manageable chunks (e.g., 3500 bytes each)
-    chunk_size = 3500
-    session["chat_history_chunks"] = [
-        encoded_chat_history[i:i + chunk_size] for i in range(0, len(encoded_chat_history), chunk_size)
-    ]
-
+    chat_his_encoded = base64.b64encode(zlib.compress(json.dumps(chat_his_decoded).encode())).decode()
+    session["chat_history"] = chat_his_encoded
+    
     return chat_his_decoded
-
 
 def get_chat_history(session: dict):
-    # If there are no chunks, return an empty list
-    if "chat_history_chunks" not in session:
-        return []
-
-    # Reassemble the chat history from chunks
-    chat_history_encoded = "".join(session["chat_history_chunks"])
+    # Check if "chat_history" exists in the session
+    if "chat_history" not in session:
+        # Initialize as an empty encoded list
+        encoded_chat_history = base64.b64encode(zlib.compress(json.dumps([]).encode())).decode()
+        session["chat_history"] = encoded_chat_history
+    
+    # Decode and decompress the chat history
     chat_his_decoded = json.loads(
-        zlib.decompress(base64.b64decode(chat_history_encoded.encode())).decode()
+        zlib.decompress(base64.b64decode(session["chat_history"].encode())).decode()
     )
-
+    
     return chat_his_decoded
-
 
 def add_to_search_history(session: dict ,search_index: int, search_item: str):
     if "search_history" not in session:
