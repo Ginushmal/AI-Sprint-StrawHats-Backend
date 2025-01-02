@@ -72,14 +72,14 @@ def check_inventory(request: Request):
     else:
         # Inventory has changed
         changed_inventory = []
-        for current in previous_inventory:
-            for prev in current_inventory:
-                if current['Item'] == prev['Item']:
-                    if current['Count'] < prev['Count']:
-                        changed_inventory.append({'Item': current['Item'], 'Count': prev['Count'] - current['Count']})
+        for prev in previous_inventory:
+            for current in current_inventory:
+                if prev['Item'] == current['Item']:
+                    if prev['Count'] > current['Count']:
+                        changed_inventory.append({'Item': prev['Item'], 'Count': prev['Count'] - current['Count']})
                         break
             else:
-                changed_inventory.append({'Item': current['Item'], 'Count': current['Count']})
+                changed_inventory.append({'Item': prev['Item'], 'Count': prev['Count']})
         most_wanted_item = max(changed_inventory, key=lambda x: x['Count'])
         message = f"I want to buy {most_wanted_item['Item']}."
         top_5_search_results = talk_to_gpt(user_input=message, request=request)
