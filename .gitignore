@@ -2,6 +2,6 @@
 AI_Sprint_OpenAI_API_Key.yml
 
 .history/
-.__pycache__
 .env
 
+__pycache__
