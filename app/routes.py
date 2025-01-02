@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
-from .utils import update_session_list, get_session_list  # Import the utility functions
+from .utils import update_session_list, get_session_list ,get_chat_history  # Import the utility functions
 
 router = APIRouter()
 
@@ -22,3 +22,10 @@ async def get_list(request: Request):
     session = request.session
     user_list = session.get("user_list", [])
     return {"list": user_list}
+
+@router.get("/get-chat_history/")
+async def get_list(request: Request):
+    session = request.session
+    chat_his = get_chat_history(session)
+    
+    return chat_his
