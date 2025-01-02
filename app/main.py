@@ -53,11 +53,12 @@ def echo(message: str):
 
 @app.post("/check-inventory")
 def check_inventory(request: Request):
-    previous_inventory = [{'Item': 'apple', 'Count': 5}, {'Item': 'broccoli', 'Count': 1}, {'Item': 'cake', 'Count': 2}]
+    previous_inventory = [{'Item': 'banana', 'Count': 2}]
     # mock_camera = MockCamera()
     # image_path = mock_camera.get_img_path()
     camera = LaptopCamera()
     image_path = CameraHandler(camera).get_img_path()
+    print(image_path)
     inventory_df, results = detect_inventory(image_path)
     current_inventory = inventory_df.to_dict('records')
 
@@ -71,8 +72,8 @@ def check_inventory(request: Request):
     else:
         # Inventory has changed
         changed_inventory = []
-        for current in current_inventory:
-            for prev in previous_inventory:
+        for current in previous_inventory:
+            for prev in current_inventory:
                 if current['Item'] == prev['Item']:
                     if current['Count'] < prev['Count']:
                         changed_inventory.append({'Item': current['Item'], 'Count': prev['Count'] - current['Count']})

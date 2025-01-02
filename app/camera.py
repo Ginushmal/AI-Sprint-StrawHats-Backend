@@ -17,7 +17,7 @@ class LaptopCamera(CameraDeviceInterface):
 
     def take_image(self) -> str:
         # cap = cv2.VideoCapture(0)  # Open the default camera
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # DirectShow for Windows
+        cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)  # DirectShow for Windows
         if not cap.isOpened():
             raise RuntimeError("Unable to access the camera")
 
