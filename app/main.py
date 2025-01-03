@@ -80,6 +80,8 @@ def check_inventory(request: Request):
                     break
             else:
                 changed_inventory.append({'Item': prev['Item'], 'Count': prev['Count']})
+        if not changed_inventory:
+            return {"message": "Inventory has not changed.", "status": 0, "bot_output": []}
         most_wanted_item = max(changed_inventory, key=lambda x: x['Count'])
         message = f"I want to buy {most_wanted_item['Item']}."
         top_5_search_results = talk_to_gpt(user_input=message, request=request)
