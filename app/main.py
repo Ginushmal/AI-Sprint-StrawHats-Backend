@@ -55,7 +55,7 @@ def echo(message: str):
 
 @app.post("/check-inventory")
 def check_inventory(request: Request):
-    previous_inventory = [{'Item': 'banana', 'Count': 2}]
+    previous_inventory = [{'Item': 'banana', 'Count': 2}, {'Item': 'apple', 'Count': 1}]
     # mock_camera = MockCamera()
     # image_path = mock_camera.get_img_path()
     camera = LaptopCamera()
