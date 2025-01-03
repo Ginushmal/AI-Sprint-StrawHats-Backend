@@ -14,6 +14,7 @@ OPENAI_API_KEY=sk-<https://platform.openai.com/api-keys>
 env : `python -m venv .venv`
 activate : `.\.venv\Scripts\activate`
 
-init : `pip install "fastapi[standard]"`
+install fastAPI : `pip install "fastapi[standard]"`
+install : `pip install -r requirements.txt`
 go to app : `cd app`
 run : `fastapi dev main.py`
