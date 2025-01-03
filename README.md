@@ -3,6 +3,11 @@
 model: https://huggingface.co/Ultralytics/YOLO11
 move model to models/yolo11x.pt
 
+## IV cam
+
+install IV cam and connect to the phone
+https://www.e2esoft.com/ivcam/
+
 ## env
 
 SEARCH_API_KEY=from <https://www.searchapi.io/>
@@ -16,5 +21,4 @@ activate : `.\.venv\Scripts\activate`
 
 install fastAPI : `pip install "fastapi[standard]"`
 install : `pip install -r requirements.txt`
-go to app : `cd app`
-run : `fastapi dev main.py`
+run : `fastapi dev .\app\main.py  `
