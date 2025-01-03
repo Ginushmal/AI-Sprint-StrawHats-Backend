@@ -8,6 +8,8 @@ from app.inventory_detection import detect_inventory
 from app.camera import CameraHandler, LaptopCamera
 from .chatAgentFuncs import talk_to_gpt
 
+changed_items = []
+
 app = FastAPI()
 
 # Add CORS middleware
@@ -73,13 +75,16 @@ def check_inventory(request: Request):
         # Inventory has changed
         changed_inventory = []
         for prev in previous_inventory:
-            for current in current_inventory:
-                if prev['Item'] == current['Item']:
-                    if prev['Count'] > current['Count']:
-                        changed_inventory.append({'Item': prev['Item'], 'Count': prev['Count'] - current['Count']})
-                    break
-            else:
-                changed_inventory.append({'Item': prev['Item'], 'Count': prev['Count']})
+            if prev['Item'] not in changed_items:
+                for current in current_inventory:
+                    if prev['Item'] == current['Item']:
+                        if prev['Count'] > current['Count']:
+                            changed_inventory.append({'Item': prev['Item'], 'Count': prev['Count'] - current['Count']})
+                            changed_items.append(prev['Item'])
+                        break
+                else:
+                    changed_inventory.append({'Item': prev['Item'], 'Count': prev['Count']})
+                    changed_items.append(prev['Item'])
         if not changed_inventory:
             return {"message": "Inventory has not changed.", "status": 0, "bot_output": []}
         most_wanted_item = max(changed_inventory, key=lambda x: x['Count'])
