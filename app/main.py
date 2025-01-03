@@ -87,10 +87,11 @@ def check_inventory(request: Request):
                     changed_items.append(prev['Item'])
         if not changed_inventory:
             return {"message": "Inventory has not changed.", "status": 0, "bot_output": []}
-        most_wanted_item = max(changed_inventory, key=lambda x: x['Count'])
-        message = f"I want to buy {most_wanted_item['Item']}."
-        top_5_search_results = talk_to_gpt(user_input=message, request=request)
-        return {"message": f"Running low on {most_wanted_item['Item']}.", "status": 1, "bot_output": top_5_search_results}
+        else:
+            most_wanted_item = max(changed_inventory, key=lambda x: x['Count'])
+            message = f"I want to buy {most_wanted_item['Item']}."
+            top_5_search_results = talk_to_gpt(user_input=message, request=request)
+            return {"message": f"Running low on {most_wanted_item['Item']}.", "status": 1, "bot_output": top_5_search_results}
 
 @app.post("/check_fridge")
 def check_fridge(request: Request):
